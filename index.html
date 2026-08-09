@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="theme-color" content="#0d1f3c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Presupuestos Fénix</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- PANTALLA: FORMULARIO                                         -->
+<!-- ============================================================ -->
+<div id="screen-formulario" class="screen active">
+  <div class="screen-content">
+
+    <!-- Encabezado del taller (solo visual, no editable) -->
+    <div class="pdf-header">
+      <img class="pdf-header-bg" src="img/FenixBanner.png" alt="">
+      <div class="pdf-header-overlay"></div>
+      <div class="pdf-header-content">
+        <img class="pdf-header-icon" src="img/FenixIcono.png" alt="Fénix">
+        <div class="pdf-header-nombre">
+          <h1>FÉNIX</h1>
+          <p>TALLER DE RESTAURACIONES · ESPECIALISTAS EN CROMADOS</p>
+          <small>Tel: 15-6912-7259 · Buenos Aires</small>
+        </div>
+        <div class="pdf-header-numero">
+          <div class="label">Presupuesto</div>
+          <div class="numero" id="display-numero">N° —</div>
+          <div class="fecha" id="display-fecha">—</div>
+          <div class="validez" id="display-validez">Validez: 15 días</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Datos del pedido -->
+    <div class="form-section">
+      <h3>Datos del presupuesto</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>N° de presupuesto</label>
+          <input type="number" id="campo-numero" min="1">
+        </div>
+        <div class="form-group">
+          <label>Validez (días)</label>
+          <input type="number" id="campo-validez" value="15" min="1">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Datos del cliente</h3>
+      <div class="form-grid full">
+        <div class="form-group">
+          <label>Cliente</label>
+          <input type="text" id="campo-cliente" placeholder="Nombre del cliente">
+        </div>
+      </div>
+      <div class="form-grid" style="margin-top:10px">
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="tel" id="campo-telefono" placeholder="15-XXXX-XXXX">
+        </div>
+        <div class="form-group">
+          <label>Localidad</label>
+          <input type="text" id="campo-localidad" placeholder="Buenos Aires">
+        </div>
+        <div class="form-group">
+          <label>Vehículo</label>
+          <input type="text" id="campo-vehiculo" placeholder="Marca y modelo">
+        </div>
+        <div class="form-group">
+          <label>Patente</label>
+          <input type="text" id="campo-patente" placeholder="ABC 123">
+        </div>
+      </div>
+      <div class="form-grid full" style="margin-top:10px">
+        <div class="form-group">
+          <label>Domicilio</label>
+          <input type="text" id="campo-domicilio" placeholder="Dirección del cliente">
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de ítems -->
+    <div class="form-section" style="padding:14px 0">
+      <h3 style="padding: 0 14px">Ítems del presupuesto</h3>
+      <div class="tabla-container" style="padding:0">
+        <table class="items">
+          <thead>
+            <tr>
+              <th style="width:40px">CANT.</th>
+              <th>DETALLE</th>
+              <th style="width:90px">P. UNIT</th>
+              <th style="width:95px">IMPORTE</th>
+              <th style="width:32px"></th>
+            </tr>
+          </thead>
+          <tbody id="items-body">
+            <!-- Filas generadas por JS -->
+          </tbody>
+        </table>
+      </div>
+      <div style="padding: 10px 14px">
+        <button class="btn btn-outline btn-sm" id="btn-agregar-item">+ Agregar ítem</button>
+      </div>
+    </div>
+
+    <div class="total-row" id="total-display">TOTAL: $ 0</div>
+
+    <!-- Acciones -->
+    <div class="acciones">
+      <button class="btn btn-outline" id="btn-nuevo">🆕 Nuevo</button>
+      <button class="btn btn-primary" id="btn-preview">👁 Vista previa</button>
+      <button class="btn btn-success" id="btn-compartir">📤 WhatsApp PDF</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PANTALLA: VISTA PREVIA                                       -->
+<!-- ============================================================ -->
+<div id="screen-preview" class="screen">
+  <div class="screen-content">
+    <div style="background:#555;padding:10px;display:flex;gap:8px;align-items:center">
+      <button class="btn btn-outline btn-sm" id="btn-preview-volver">← Volver</button>
+      <span style="color:white;font-size:0.8rem;flex:1">Vista previa del PDF</span>
+      <button class="btn btn-success btn-sm" id="btn-preview-compartir">📤 Compartir</button>
+    </div>
+
+    <!-- Documento renderizado (este div se captura para el PDF) -->
+    <div id="documento-preview" style="background:white">
+      <div class="pdf-header">
+        <img class="pdf-header-bg" src="img/FenixBanner.png" alt="">
+        <div class="pdf-header-overlay"></div>
+        <div class="pdf-header-content">
+          <img class="pdf-header-icon" src="img/FenixIcono.png" alt="Fénix">
+          <div class="pdf-header-nombre">
+            <h1>FÉNIX</h1>
+            <p>TALLER DE RESTAURACIONES · ESPECIALISTAS EN CROMADOS</p>
+            <small>Tel: 15-6912-7259 · Buenos Aires</small>
+          </div>
+          <div class="pdf-header-numero">
+            <div class="label">Presupuesto</div>
+            <div class="numero" id="preview-numero">N° —</div>
+            <div class="fecha" id="preview-fecha">—</div>
+            <div class="validez" id="preview-validez">Validez: 15 días</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="datos-cliente" id="preview-datos-cliente">
+        <!-- Rellenado por JS -->
+      </div>
+
+      <div class="tabla-container">
+        <table class="items" id="preview-tabla">
+          <thead>
+            <tr>
+              <th style="width:40px">CANT.</th>
+              <th>DETALLE</th>
+              <th style="width:90px">P. UNIT</th>
+              <th style="width:95px">IMPORTE</th>
+            </tr>
+          </thead>
+          <tbody id="preview-items-body"></tbody>
+        </table>
+      </div>
+
+      <div class="total-row" id="preview-total">TOTAL: $ 0</div>
+
+      <div class="pdf-footer">
+        <b id="preview-validez-footer">Validez del presupuesto: 15 días</b>
+        Este presupuesto no es válido como factura. Precios sujetos a variación pasada la fecha de validez.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PANTALLA: HISTORIAL                                          -->
+<!-- ============================================================ -->
+<div id="screen-historial" class="screen">
+  <div class="screen-content">
+    <div style="background:var(--azul);padding:14px;color:white;font-weight:700;font-size:1rem">
+      Historial de presupuestos
+    </div>
+    <div id="historial-lista" class="historial-lista">
+      <!-- Rellenado por JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAV INFERIOR                                                 -->
+<!-- ============================================================ -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-screen="formulario">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z"/></svg>
+    Presupuesto
+  </button>
+  <button class="nav-btn" data-screen="historial">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 0 1 7-7 7 7 0 0 1 7 7 7 7 0 0 1-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 9-9 9 9 0 0 0-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+    Historial
+  </button>
+</nav>
+
+<!-- Toast y spinner -->
+<div class="toast" id="toast"></div>
+<div class="spinner-overlay" id="spinner">
+  <div class="spinner"></div>
+  <span>Generando PDF...</span>
+</div>
+
+<script src="js/lib/jspdf.umd.min.js"></script>
+<script src="js/lib/html2canvas.min.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
