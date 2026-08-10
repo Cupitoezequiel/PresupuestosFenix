@@ -52,22 +52,25 @@ export async function generarYCompartirPDF(numeroPresupuesto) {
   const { blob, nombreArchivo } = await crearPDFBlob(numeroPresupuesto);
   const file = new File([blob], nombreArchivo, { type: 'application/pdf' });
 
+  const puedeCompartirArchivos = !!(navigator.canShare && navigator.canShare({ files: [file] }));
+
   // Intentar Web Share API (Android Chrome)
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+  if (puedeCompartirArchivos) {
     try {
       await navigator.share({
         files: [file],
         title: `Presupuesto Fénix N° ${numeroPresupuesto}`,
       });
-      return 'compartido';
+      return { resultado: 'compartido' };
     } catch (err) {
       if (err.name === 'AbortError') throw err; // el usuario canceló, no descargar
       console.error('navigator.share falló, uso descarga directa:', err);
-      // sigue a la descarga directa abajo
+      descargarBlob(blob, nombreArchivo);
+      return { resultado: 'descargado', motivo: `${err.name}: ${err.message}` };
     }
   }
 
-  // Fallback: descarga directa
+  // Fallback: descarga directa (el navegador no soporta compartir archivos)
   descargarBlob(blob, nombreArchivo);
-  return 'descargado';
+  return { resultado: 'descargado', motivo: 'canShare no soporta archivos en este navegador' };
 }
