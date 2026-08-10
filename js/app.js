@@ -46,8 +46,8 @@ async function compartir() {
     const { resultado, motivo } = await generarYCompartirPDF(p.numero);
     guardarPresupuesto(p);
     if (resultado === 'descargado') {
-      // TODO diagnóstico: sacar el motivo del mensaje una vez resuelto el share nativo
-      toast(`✓ PDF descargado (share falló: ${motivo}). Buscalo en "Descargas".`, 6000);
+      if (motivo) console.warn('navigator.share falló:', motivo);
+      toast('✓ PDF descargado. Buscalo en "Descargas" para enviarlo por WhatsApp.', 4000);
     } else {
       toast('✓ Presupuesto guardado');
     }
@@ -97,7 +97,7 @@ document.getElementById('btn-preview').addEventListener('click', () => {
 // Botón compartir (desde formulario)
 document.getElementById('btn-compartir').addEventListener('click', compartir);
 
-// Botón descargar PDF (aísla la generación del envío, para diagnóstico)
+// Botón descargar PDF (genera el PDF sin intentar compartirlo)
 document.getElementById('btn-descargar').addEventListener('click', async () => {
   const p = getFormData();
   if (!p.cliente && !p.vehiculo) {
@@ -132,8 +132,8 @@ document.getElementById('btn-preview-compartir').addEventListener('click', async
     const { resultado, motivo } = await generarYCompartirPDF(p.numero);
     guardarPresupuesto(p);
     if (resultado === 'descargado') {
-      // TODO diagnóstico: sacar el motivo del mensaje una vez resuelto el share nativo
-      toast(`✓ PDF descargado (share falló: ${motivo}). Buscalo en "Descargas".`, 6000);
+      if (motivo) console.warn('navigator.share falló:', motivo);
+      toast('✓ PDF descargado. Buscalo en "Descargas" para enviarlo por WhatsApp.', 4000);
     } else {
       toast('✓ Presupuesto guardado');
     }
