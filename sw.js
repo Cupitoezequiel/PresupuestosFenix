@@ -1,21 +1,22 @@
 const CACHE_NAME = 'fenix-v1';
+const BASE = new URL('.', self.registration.scope).pathname;
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/css/app.css',
-  '/js/app.js',
-  '/js/format.js',
-  '/js/storage.js',
-  '/js/formulario.js',
-  '/js/preview.js',
-  '/js/historial.js',
-  '/js/pdf.js',
-  '/js/lib/jspdf.umd.min.js',
-  '/js/lib/html2canvas.min.js',
-  '/img/FenixBanner.png',
-  '/img/FenixIcono.png',
-];
+  '',
+  'index.html',
+  'manifest.json',
+  'css/app.css',
+  'js/app.js',
+  'js/format.js',
+  'js/storage.js',
+  'js/formulario.js',
+  'js/preview.js',
+  'js/historial.js',
+  'js/pdf.js',
+  'js/lib/jspdf.umd.min.js',
+  'js/lib/html2canvas.min.js',
+  'img/FenixBanner.png',
+  'img/FenixIcono.png',
+].map(p => BASE + p);
 
 self.addEventListener('install', event => {
   event.waitUntil(
