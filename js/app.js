@@ -36,6 +36,12 @@ async function compartir() {
   }
   renderPreview(p);
   spinner(true);
+  // documento-preview vive dentro de screen-preview: si esa pantalla no está
+  // activa, el div se renderiza con tamaño 0x0 y html2canvas falla al toque.
+  // La activamos brevemente; el overlay del spinner la tapa mientras tanto.
+  const screenPreview = document.getElementById('screen-preview');
+  const yaEstabaActiva = screenPreview.classList.contains('active');
+  if (!yaEstabaActiva) screenPreview.classList.add('active');
   try {
     await generarYCompartirPDF(p.numero);
     guardarPresupuesto(p);
@@ -46,6 +52,7 @@ async function compartir() {
       console.error(err);
     }
   } finally {
+    if (!yaEstabaActiva) screenPreview.classList.remove('active');
     spinner(false);
   }
 }
