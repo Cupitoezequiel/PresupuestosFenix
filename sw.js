@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fenix-v1';
+const CACHE_NAME = 'fenix-v2';
 const BASE = new URL('.', self.registration.scope).pathname;
 const ASSETS = [
   '',
@@ -35,7 +35,18 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+  // Red primero: si hay conexión, siempre trae la versión más nueva y
+  // actualiza la caché. Si falla (sin conexión), usa lo último cacheado.
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
+    fetch(event.request)
+      .then(response => {
+        if (response.ok) {
+          const copia = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copia));
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
