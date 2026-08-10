@@ -33,17 +33,24 @@ export async function generarYCompartirPDF(numeroPresupuesto) {
 
   // Intentar Web Share API (Android Chrome)
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    await navigator.share({
-      files: [file],
-      title: `Presupuesto Fénix N° ${numeroPresupuesto}`,
-    });
-  } else {
-    // Fallback: descarga directa
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = nombreArchivo;
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      await navigator.share({
+        files: [file],
+        title: `Presupuesto Fénix N° ${numeroPresupuesto}`,
+      });
+      return;
+    } catch (err) {
+      if (err.name === 'AbortError') throw err; // el usuario canceló, no descargar
+      console.error('navigator.share falló, uso descarga directa:', err);
+      // sigue a la descarga directa abajo
+    }
   }
+
+  // Fallback: descarga directa
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = nombreArchivo;
+  a.click();
+  URL.revokeObjectURL(url);
 }
