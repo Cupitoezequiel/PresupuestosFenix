@@ -43,9 +43,13 @@ async function compartir() {
   const yaEstabaActiva = screenPreview.classList.contains('active');
   if (!yaEstabaActiva) screenPreview.classList.add('active');
   try {
-    await generarYCompartirPDF(p.numero);
+    const resultado = await generarYCompartirPDF(p.numero);
     guardarPresupuesto(p);
-    toast('✓ Presupuesto guardado');
+    if (resultado === 'descargado') {
+      toast('✓ PDF descargado. Buscalo en "Descargas" para enviarlo por WhatsApp.', 4000);
+    } else {
+      toast('✓ Presupuesto guardado');
+    }
   } catch (err) {
     if (err.name !== 'AbortError') {
       toast('Error al generar el PDF. Intentá de nuevo.');
@@ -100,9 +104,13 @@ document.getElementById('btn-preview-compartir').addEventListener('click', async
   const p = getFormData();
   spinner(true);
   try {
-    await generarYCompartirPDF(p.numero);
+    const resultado = await generarYCompartirPDF(p.numero);
     guardarPresupuesto(p);
-    toast('✓ Presupuesto guardado');
+    if (resultado === 'descargado') {
+      toast('✓ PDF descargado. Buscalo en "Descargas" para enviarlo por WhatsApp.', 4000);
+    } else {
+      toast('✓ Presupuesto guardado');
+    }
   } catch (err) {
     if (err.name !== 'AbortError') {
       toast('Error al generar PDF.');

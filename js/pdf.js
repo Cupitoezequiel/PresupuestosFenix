@@ -38,7 +38,7 @@ export async function generarYCompartirPDF(numeroPresupuesto) {
         files: [file],
         title: `Presupuesto Fénix N° ${numeroPresupuesto}`,
       });
-      return;
+      return 'compartido';
     } catch (err) {
       if (err.name === 'AbortError') throw err; // el usuario canceló, no descargar
       console.error('navigator.share falló, uso descarga directa:', err);
@@ -53,4 +53,5 @@ export async function generarYCompartirPDF(numeroPresupuesto) {
   a.download = nombreArchivo;
   a.click();
   URL.revokeObjectURL(url);
+  return 'descargado';
 }
