@@ -2,7 +2,7 @@
   "name": "Presupuestos Fénix",
   "short_name": "Fénix",
   "description": "Generador de presupuestos para Restauraciones Fénix",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#0d1f3c",
   "theme_color": "#0d1f3c",
