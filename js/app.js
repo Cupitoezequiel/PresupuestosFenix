@@ -1,7 +1,7 @@
 import { initFormulario, getFormData, cargarPresupuesto, limpiarFormulario } from './formulario.js';
 import { renderPreview } from './preview.js';
 import { renderHistorial } from './historial.js';
-import { generarYCompartirPDF } from './pdf.js';
+import { generarYCompartirPDF, descargarPDF } from './pdf.js';
 import { guardarPresupuesto, getPresupuesto, incrementarNumero } from './storage.js';
 
 // Routing
@@ -95,6 +95,30 @@ document.getElementById('btn-preview').addEventListener('click', () => {
 
 // Botón compartir (desde formulario)
 document.getElementById('btn-compartir').addEventListener('click', compartir);
+
+// Botón descargar PDF (aísla la generación del envío, para diagnóstico)
+document.getElementById('btn-descargar').addEventListener('click', async () => {
+  const p = getFormData();
+  if (!p.cliente && !p.vehiculo) {
+    toast('Completá al menos el cliente o el vehículo antes de descargar.');
+    return;
+  }
+  renderPreview(p);
+  spinner(true);
+  const screenPreview = document.getElementById('screen-preview');
+  const yaEstabaActiva = screenPreview.classList.contains('active');
+  if (!yaEstabaActiva) screenPreview.classList.add('active');
+  try {
+    await descargarPDF(p.numero);
+    toast('✓ PDF descargado. Buscalo en "Descargas".', 4000);
+  } catch (err) {
+    toast('Error al generar el PDF. Intentá de nuevo.');
+    console.error(err);
+  } finally {
+    if (!yaEstabaActiva) screenPreview.classList.remove('active');
+    spinner(false);
+  }
+});
 
 // Botón volver en preview
 document.getElementById('btn-preview-volver').addEventListener('click', () => mostrarPantalla('formulario'));

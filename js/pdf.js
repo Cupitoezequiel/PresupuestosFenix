@@ -1,4 +1,4 @@
-export async function generarYCompartirPDF(numeroPresupuesto) {
+async function crearPDFBlob(numeroPresupuesto) {
   const elemento = document.getElementById('documento-preview');
   const { jsPDF } = window.jspdf;
 
@@ -29,6 +29,27 @@ export async function generarYCompartirPDF(numeroPresupuesto) {
 
   const nombreArchivo = `Presupuesto-Fenix-${numeroPresupuesto}.pdf`;
   const blob = pdf.output('blob');
+  return { blob, nombreArchivo };
+}
+
+function descargarBlob(blob, nombreArchivo) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = nombreArchivo;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Solo genera y descarga el PDF, sin intentar compartir. Sirve para probar
+// que la generación funciona en un dispositivo, aislada del share nativo.
+export async function descargarPDF(numeroPresupuesto) {
+  const { blob, nombreArchivo } = await crearPDFBlob(numeroPresupuesto);
+  descargarBlob(blob, nombreArchivo);
+}
+
+export async function generarYCompartirPDF(numeroPresupuesto) {
+  const { blob, nombreArchivo } = await crearPDFBlob(numeroPresupuesto);
   const file = new File([blob], nombreArchivo, { type: 'application/pdf' });
 
   // Intentar Web Share API (Android Chrome)
@@ -47,11 +68,6 @@ export async function generarYCompartirPDF(numeroPresupuesto) {
   }
 
   // Fallback: descarga directa
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = nombreArchivo;
-  a.click();
-  URL.revokeObjectURL(url);
+  descargarBlob(blob, nombreArchivo);
   return 'descargado';
 }
